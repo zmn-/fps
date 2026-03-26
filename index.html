@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>食光计划 - 智能膳食规划与食谱管理</title>
+    <!-- Tailwind CSS v3 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- AOS Animation Library -->
+    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4CAF50',
+                        secondary: '#FF9800',
+                        light: '#F5F5F5',
+                        dark: '#333333'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif']
+                    },
+                    boxShadow: {
+                        'card': '0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1)',
+                        'card-hover': '0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05)'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+            .transition-all-300 {
+                transition: all 0.3s ease;
+            }
+            .card-hover {
+                @apply transition-all duration-300 transform hover:scale-105 hover:shadow-card-hover;
+            }
+            .btn-primary {
+                @apply bg-primary text-white px-6 py-2 rounded-full hover:bg-opacity-90 transition-all duration-300 shadow-md hover:shadow-lg;
+            }
+            .btn-secondary {
+                @apply bg-secondary text-white px-6 py-2 rounded-full hover:bg-opacity-90 transition-all duration-300 shadow-md hover:shadow-lg;
+            }
+            .section-padding {
+                @apply py-16 md:py-24;
+            }
+            .section-title {
+                @apply text-3xl md:text-4xl font-bold text-center mb-12 text-dark;
+            }
+        }
+    </style>
+</head>
+<body class="bg-light font-sans text-dark">
+    <!-- 导航栏 -->
+    <nav class="bg-white shadow-md fixed w-full z-50">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <!-- Logo -->
+                <div class="flex items-center space-x-2">
+                    <img src="https://p11-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/628f071ac17b409cb46c7b860f1e461d~tplv-a9rns2rl98-image.image?lk3s=8e244e95&rcl=202603251533482892D98D7AADF38B85A7&rrcfp=f06b921b&x-expires=1777016098&x-signature=VVCo1fUP9MMLpTCEJy7TVl2c%2BgY%3D" alt="食光计划" class="h-10">
+                    <span class="text-xl font-bold text-primary hidden md:inline">食光计划</span>
+                </div>
+                
+                <!-- 桌面导航 -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#home" class="text-dark hover:text-primary transition-all duration-300 font-medium">首页</a>
+                    <a href="#features" class="text-dark hover:text-primary transition-all duration-300 font-medium">功能介绍</a>
+                    <a href="#recipes" class="text-dark hover:text-primary transition-all duration-300 font-medium">食谱库</a>
+                    <a href="#meal-planner" class="text-dark hover:text-primary transition-all duration-300 font-medium">膳食规划</a>
+                    <a href="#shopping-list" class="text-dark hover:text-primary transition-all duration-300 font-medium">购物清单</a>
+                </div>
+                
+                <!-- 用户操作 -->
+                <div class="flex items-center space-x-4">
+                    <button class="hidden md:block btn-primary">登录 / 注册</button>
+                    <!-- 移动端菜单按钮 -->
+                    <button id="mobile-menu-button" class="md:hidden text-dark focus:outline-none">
+                        <i class="fa fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 移动端导航菜单 -->
+            <div id="mobile-menu" class="md:hidden hidden pt-4 pb-2">
+                <a href="#home" class="block py-2 text-dark hover:text-primary transition-all duration-300">首页</a>
+                <a href="#features" class="block py-2 text-dark hover:text-primary transition-all duration-300">功能介绍</a>
+                <a href="#recipes" class="block py-2 text-dark hover:text-primary transition-all duration-300">食谱库</a>
+                <a href="#meal-planner" class="block py-2 text-dark hover:text-primary transition-all duration-300">膳食规划</a>
+                <a href="#shopping-list" class="block py-2 text-dark hover:text-primary transition-all duration-300">购物清单</a>
+                <button class="mt-2 w-full btn-primary">登录 / 注册</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 首页英雄区 -->
+    <section id="home" class="pt-28 pb-16 md:pt-40 md:pb-24 bg-gradient-to-br from-primary/10 to-secondary/10">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center">
+                <div class="md:w-1/2 mb-8 md:mb-0" data-aos="fade-right" data-aos-duration="1000">
+                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-dark">
+                        让每一餐都成为<span class="text-primary">美好时光</span>
+                    </h1>
+                    <p class="text-lg md:text-xl mb-8 text-gray-600">
+                        食光计划帮助你轻松管理食谱、规划膳食、生成购物清单，让烹饪变得简单有趣，减少食物浪费。
+                    </p>
+                    <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                        <button class="btn-primary text-center">
+                            <i class="fa fa-cutlery mr-2"></i>开始使用
+                        </button>
+                        <button class="btn-secondary text-center">
+                            <i class="fa fa-play-circle mr-2"></i>观看演示
+                        </button>
+                    </div>
+                </div>
+                <div class="md:w-1/2" data-aos="fade-left" data-aos-duration="1000">
+                    <img src="https://p3-doubao-search-sign.byteimg.com/labis/be3e416e8ff76be1d2348ed26caf26c9~tplv-be4g95zd3a-image.jpeg?lk3s=feb11e32&x-expires=1789976074&x-signature=3Gu6d4YOwoNywbFR5g0BF%2FMkniM%3D" alt="美食图片" class="rounded-lg shadow-xl w-full">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 功能介绍 -->
+    <section id="features" class="section-padding bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="section-title" data-aos="fade-up">我们的核心功能</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- 功能卡片 1 -->
+                <div class="bg-white rounded-xl shadow-card p-6 card-hover" data-aos="fade-up" data-aos-delay="100">
+                    <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6 mx-auto">
+                        <i class="fa fa-book text-primary text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4 text-center">食谱收藏与管理</h3>
+                    <p class="text-gray-600 text-center">
+                        上传、收藏和分类管理各类食谱，创建属于自己的美食资料库，随时查找和分享。
+                    </p>
+                </div>
+                
+                <!-- 功能卡片 2 -->
+                <div class="bg-white rounded-xl shadow-card p-6 card-hover" data-aos="fade-up" data-aos-delay="200">
+                    <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6 mx-auto">
+                        <i class="fa fa-calendar text-primary text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4 text-center">智能膳食规划</h3>
+                    <p class="text-gray-600 text-center">
+                        根据个人喜好和营养需求，自动生成每周膳食计划，轻松安排每日三餐。
+                    </p>
+                </div>
+                
+                <!-- 功能卡片 3 -->
+                <div class="bg-white rounded-xl shadow-card p-6 card-hover" data-aos="fade-up" data-aos-delay="300">
+                    <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6 mx-auto">
+                        <i class="fa fa-shopping-cart text-primary text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4 text-center">食材清单生成</h3>
+                    <p class="text-gray-600 text-center">
+                        基于所选食谱自动生成购物清单，按超市分类整理，避免遗漏和重复购买。
+                    </p>
+                </div>
+            </div>
+            
+            <!-- AI 亮点功能 -->
+            <div class="mt-16 bg-gradient-to-r from-primary/5 to-secondary/5 rounded-2xl p-8 md:p-12" data-aos="fade-up">
+                <div class="flex flex-col md:flex-row items-center">
+                    <div class="md:w-1/2 mb-8 md:mb-0">
+                        <img src="https://p26-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/40aff88911cc4e538eda7f91bec95cbf~tplv-a9rns2rl98-image.image?lk3s=8e244e95&rcl=202603251533482892D98D7AADF38B85A7&rrcfp=f06b921b&x-expires=1777016099&x-signature=lJhDhDI8bRckUmmTm2DxzZPkU3g%3D" alt="AI推荐" class="rounded-lg shadow-lg w-full">
+                    </div>
+                    <div class="md:w-1/2 md:pl-12">
+                        <div class="inline-block bg-primary/10 text-primary px-4 py-1 rounded-full text-sm font-medium mb-4">
+                            AI 智能推荐
+                        </div>
+                        <h3 class="text-2xl md:text-3xl font-bold mb-4">个性化食谱推荐</h3>
+                        <p class="text-gray-600 mb-6">
+                            我们的AI系统会根据你的口味偏好、季节变化和健康目标，智能推荐适合你的食谱，让你的饮食更加多样化和健康。
+                        </p>
+                        <ul class="space-y-3">
+                            <li class="flex items-center">
+                                <i class="fa fa-check-circle text-primary mr-3"></i>
+                                <span>学习你的口味偏好和烹饪习惯</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fa fa-check-circle text-primary mr-3"></i>
+                                <span>根据季节和时令食材推荐食谱</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fa fa-check-circle text-primary mr-3"></i>
+                                <span>提供营养均衡的膳食建议</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 食谱库 -->
+    <section id="recipes" class="section-padding bg-light">
+        <div class="container mx-auto px-4">
+            <h2 class="section-title" data-aos="fade-up">探索精选食谱</h2>
+            
+            <!-- 搜索和筛选 -->
+            <div class="mb-10" data-aos="fade-up">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div class="relative flex-grow max-w-md">
+                        <input type="text" placeholder="搜索食谱..." class="w-full px-5 py-3 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                        <button class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-primary">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <button class="px-4 py-2 rounded-full bg-primary text-white">全部</button>
+                        <button class="px-4 py-2 rounded-full bg-white text-dark hover:bg-gray-100">早餐</button>
+                        <button class="px-4 py-2 rounded-full bg-white text-dark hover:bg-gray-100">午餐</button>
+                        <button class="px-4 py-2 rounded-full bg-white text-dark hover:bg-gray-100">晚餐</button>
+                        <button class="px-4 py-2 rounded-full bg-white text-dark hover:bg-gray-100">素食</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 食谱卡片网格 -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <!-- 食谱卡片 1 -->
+                <div class="bg-white rounded-xl overflow-hidden shadow-card card-hover" data-aos="fade-up" data-aos-delay="100">
+                    <img src="https://p11-doubao-search-sign.byteimg.com/labis/60e5d405d6adc1e755952c18670679a3~tplv-be4g95zd3a-image.jpeg?lk3s=feb11e32&x-expires=1789976074&x-signature=gIUyFMY%2Bu%2F8bW2u4t2%2Bes8HUIsw%3D" alt="南瓜泥意面" class="w-full h-48 object-cover">
+                    <div class="p-5">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-lg font-bold">南瓜泥意面</h3>
+                            <button class="text-gray-400 hover:text-primary">
+                                <i class="fa fa-heart-o"></i>
+                            </button>
+                        </div>
+                        <div class="flex items-center text-sm text-gray-500 mb-3">
+                            <span class="flex items-center mr-3">
+                                <i class="fa fa-clock-o mr-1"></i> 15分钟
+                            </span>
+                            <span class="flex items-center">
+                                <i class="fa fa-signal mr-1"></i> 简单
+                            </span>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-4">营养丰富的南瓜泥意面，口感 creamy，适合早餐或午餐。</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-medium text-primary">666 千卡</span>
+                            <button class="text-primary hover:text-primary/80 font-medium">查看详情</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 食谱卡片 2 -->
+                <div class="bg-white rounded-xl overflow-hidden shadow-card card-hover" data-aos="fade-up" data-aos-delay="200">
+                    <img src="https://p11-doubao-search-sign.byteimg.com/labis/image/b99a7eeff993f8a2eeb74bc29ab85c9e~tplv-be4g95zd3a-image.jpeg?lk3s=feb11e32&x-expires=1789976074&x-signature=zmNHwnxfwM2XugE5qotaW%2B4Ghgk%3D" alt="牛油果蘸酱香草牛排" class="w-full h-48 object-cover">
+                    <div class="p-5">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-lg font-bold">牛油果蘸酱香草牛排</h3>
+                            <button class="text-gray-400 hover:text-primary">
+                                <i class="fa fa-heart-o"></i>
+                            </button>
+                        </div>
+                        <div class="flex items-center text-sm text-gray-500 mb-3">
+                            <span class="flex items-center mr-3">
+                                <i class="fa fa-clock-o mr-1"></i> 25分钟
+                            </span>
+                            <span class="flex items-center">
+                                <i class="fa fa-signal mr-1"></i> 中等
+                            </span>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-4">健康美味的牛排搭配新鲜牛油果蘸酱，营养均衡的晚餐选择。</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-medium text-primary">520 千卡</span>
+                            <button class="text-primary hover:text-primary/80 font-medium">查看详情</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 食谱卡片 3 -->
+                <div class="bg-white rounded-xl overflow-hidden shadow-card card-hover" data-aos="fade-up" data-aos-delay="300">
+                    <img src="https://p3-doubao-search-sign.byteimg.com/labis/image/6c68b0198d15354c7ce992568d557836~tplv-be4g95zd3a-image.jpeg?lk3s=feb11e32&x-expires=1789976074&x-signature=VGLGkLmDXgNE4WWk3tLUpmxhOcY%3D" alt="健康牛油果鸡肉三明治" class="w-full h-48 object-cover">
+                    <div class="p-5">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-lg font-bold">健康牛油果鸡肉三明治</h3>
+                            <button class="text-gray-400 hover:text-primary">
+                                <i class="fa fa-heart-o"></i>
+                            </button>
+                        </div>
+                        <div class="flex items-center text-sm text-gray-500 mb-3">
+                            <span class="flex items-center mr-3">
+                                <i class="fa fa-clock-o mr-1"></i> 10分钟
+                            </span>
+                            <span class="flex items-center">
+                                <i class="fa fa-signal mr-1"></i> 简单
+                            </span>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-4">清爽可口的牛油果鸡肉三明治，适合快速午餐或野餐。</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-medium text-primary">435 千卡</span>
+                            <button class="text-primary hover:text-primary/80 font-medium">查看详情</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 食谱卡片 4 -->
+                <div class="bg-white rounded-xl overflow-hidden shadow-card card-hover" data-aos="fade-up" data-aos-delay="400">
+                    <img src="https://p26-doubao-search-sign.byteimg.com/labis/image/1ceb7c7c4bd591763822c11b08119b01~tplv-be4g95zd3a-image.jpeg?lk3s=feb11e32&x-expires=1789976074&x-signature=F8XznvMKYH%2F%2FvHLHeXlthzfQuek%3D" alt="三文鱼三明治" class="w-full h-48 object-cover">
+                    <div class="p-5">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-lg font-bold">三文鱼三明治</h3>
+                            <button class="text-gray-400 hover:text-primary">
+                                <i class="fa fa-heart-o"></i>
+                            </button>
+                        </div>
+                        <div class="flex items-center text-sm text-gray-500 mb-3">
+                            <span class="flex items-center mr-3">
+                                <i class="fa fa-clock-o mr-1"></i> 15分钟
+                            </span>
+                            <span class="flex items-center">
+                                <i class="fa fa-signal mr-1"></i> 简单
+                            </span>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-4">营养丰富的三文鱼三明治，富含优质蛋白质和Omega-3。</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-medium text-primary">490 千卡</span>
+                            <button class="text-primary hover:text-primary/80 font-medium">查看详情</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 查看更多按钮 -->
+            <div class="text-center mt-10">
+                <button class="btn-primary">
+                    查看更多食谱 <i class="fa fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- 膳食规划 -->
+    <section id="meal-planner" class="section-padding bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="section-title" data-aos="fade-up">智能膳食规划</h2>
+            
+            <div class="flex flex-col lg:flex-row gap-8">
+                <!-- 左侧膳食日历 -->
+                <div class="lg:w-2/3 bg-white rounded-xl shadow-card p-6" data-aos="fade-right">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold">本周膳食计划</h3>
+                        <div class="flex space-x-2">
+                            <button class="px-3 py-1 rounded bg-gray-100 hover:bg-gray-200">
+                                <i class="fa fa-chevron-left"></i>
+                            </button>
+                            <span class="px-3 py-1 rounded bg-primary/10 text-primary font-medium">5月15日 - 5月21日</span>
+                            <button class="px-3 py-1 rounded bg-gray-100 hover:bg-gray-200">
+                                <i class="fa fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 膳食日历 -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full border-collapse">
+                            <thead>
+                                <tr>
+                                    <th class="p-2 text-left font-medium text-gray-500">餐次</th>
+                                    <th class="p-2 text-center font-medium text-gray-500">周一</th>
+                                    <th class="p-2 text-center font-medium text-gray-500">周二</th>
+                                    <th class="p-2 text-center font-medium text-gray-500">周三</th>
+                                    <th class="p-2 text-center font-medium text-gray-500">周四</th>
+                                    <th class="p-2 text-center font-medium text-gray-500">周五</th>
+                                    <th class="p-2 text-center font-medium text-gray-500">周六</th>
+                                    <th class="p-2 text-center font-medium text-gray-500">周日</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- 早餐 -->
+                                <tr class="border-b border-gray-100">
+                                    <td class="p-2 font-medium">早餐</td>
+                                    <td class="p-2">
+                                        <div class="bg-primary/5 rounded-lg p-2 text-center cursor-pointer hover:bg-primary/10 transition-all">
+                                            <div class="text-sm font-medium">燕麦粥</div>
+                                            <div class="text-xs text-gray-500">150千卡</div>
+                                        </div>
+                                    </td>
+                                    <td class="p-2">
+                                        <div class="bg-primary/5 rounded-lg p-2 text-center cursor-pointer hover:bg-primary/10 transition-all">
+                                            <div class="text-sm font-medium">全麦面包</div>
+                                            <div class="text-xs text-gray-500">200千卡</div>
+                                        </div>
+                                    </td>
+                                    <td class="p-2">
+                                        <div class="bg-primary/5 rounded-lg p-2 text-center cursor-pointer hover:bg-primary/10 transition-all">
+                                            <div class="text-sm font-medium">鸡蛋煎饼</div>
+                                            <div class="text-xs text-gray-500">220千卡</div>
+                                        </div>
+                                    </td>
+                                    <td class="p-2">
+                                        <div class="bg-primary/5 rounded-lg p-2 text-center cursor-pointer hover:bg-primary/10 transition-all">
+                                            <div class="text-sm font-medium">水果沙拉</div>
+                                            <div class="text-xs text-gray-500">180千卡</div>
+                                        </div>
+                                    </td>
+                                    <td class="p-2">
+                                        <div class="bg-primary/5 rounded-lg p-2 text-center cursor-pointer hover:bg-primary/10 transition-all">
+                                            <div class="text-sm font-medium">酸奶碗</div>
+                                            <div class="text-xs text-gray-500">160千卡</div>
+                                        </div>
+                                    </td>
+                                    <td class="p-2">
+                                        <div class="bg-primary/5 rounded-lg p-2 text-center cursor-pointer hover:bg-primary/10 transition-all">
+                                            <div class="text-sm font-medium">华夫饼</div>
+                                            <div class="text-xs text-gray-500">240千卡</div>
+                                        </div>
+                                    </td>
+                                    <td class="p-2">
+                                        <div class="bg-primary/5 rounded-lg p-2 text-center cursor-pointer hover:bg-primary/10 transition-all">
+                                            <div class="text-sm font-medium">蔬菜蛋卷</div>
+                                            <div class="text-xs text-gray-500">210千卡</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                                <!-- 午餐 -->
+                                <tr class="border-b border-gray-100">
+                                    <td class="p-2 font-medium">午餐</td>
+                                    <td class="p-2">
+                                        <div class="bg-primary/5 rounded-lg p-2 text-center cursor-pointer hover:bg-primary/10 transition-all">
+                                            <div class="text-sm font-medium">南瓜泥意面</div>
+                                            <div class="text-xs text-gray-500">666千卡</div>
+                                        </div>
+                                    </td>
+                                    <td class="p-2">
+                                        <div class="bg-primary/5 rounded-lg p-2 text-center cursor-pointer hover:bg-primary/10 transition-all">
+                                            <div class="text-sm font-medium">健康三明治</div>
+                                            <div class="text-xs text-gray-500">435千卡</div>
+                                        </div>
+                                    </td>
+                                    <td class="p-2">
+                                        <div class="bg-primary/5 rounded-lg p-2 text-center cursor-pointer hover:bg-primary/10 transition-all">
+                                            <div class="text-sm font-medium">蔬菜炒饭</div>
+                                            <div class="text-xs text-gray-500">520千卡</div>
+                                        </div>
+                                    </td>
+                                    <td class="p-2">
+                                        <div class="bg-primary/5 rounded-lg p-2 text-center cursor-pointer hover:bg-primary/10 transition-all">
+                                            <div class="text-sm font-medium">三文鱼沙拉</div>
+                                            <div class="text-xs text-gray-500">490千卡</div>
+                                        </div>
+                                    </td>
+                                    <td class="p-2">
+                                        <div class="bg-primary/5 rounded-lg p-2 text-center cursor-pointer hover:bg-primary/10 transition-all">
+                                            <div class="text-sm font-medium">番茄鸡蛋面</div>
+                                            <div class="text-xs text-gray-500">580千卡</div>
+                                        </div>
+                                    </td>
+                                    <td class="p-2">
+                                        <div class="bg-primary/5 rounded-lg p-2 text-center cursor-pointer hover:bg-primary/10 transition-all">
+                                            <div class="text-sm font-medium">鸡胸肉沙拉</div>
+                                            <div class="text-xs text-gray-500">450千卡</div>
+                                        </div>
+                                    </td>
+                                    <td class="p-2">
+                                        <div class="bg-primary/5 rounded-lg p-2 text-center cursor-pointer hover:bg-primary/10 transition-all">
+                                            <div class="text-sm font-medium">蔬菜汤面</div>
+                                            <div class="text-xs text-gray-500">510千卡</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                                <!-- 晚餐 -->
+                                <tr>
+                                    <td class="p-2 font-medium">晚餐</td>
+                                    <td class="p-2">
+                                        <div class="bg-primary/5 rounded-lg p-2 text-center cursor-pointer hover:bg-primary/10 transition-all">
+                                            <div class="text-sm font-medium">牛油果蘸酱牛排</div>
+                                            <div class="text-xs text-gray-500">520千卡</div>
+                                        </div>
+                                    </td>
+                                    <td class="p-2">
+                                        <div class="bg-primary/5 rounded-lg p-2 text-center cursor-pointer hover:bg-primary/10 transition-all">
+                                            <div class="text-sm font-medium">清蒸鱼</div>
+                                            <div class="text-xs text-gray-500">480千卡</div>
+                                        </div>
+                                    </td>
+                                    <td class="p-2">
+                                        <div class="bg-primary/5 rounded-lg p-2 text-center cursor-pointer hover:bg-primary/10 transition-all">
+                                            <div class="text-sm font-medium">蔬菜豆腐汤</div>
+                                            <div class="text-xs text-gray-500">320千卡</div>
+                                        </div>
+                                    </td>
+                                    <td class="p-2">
+                                        <div class="bg-primary/5 rounded-lg p-2 text-center cursor-pointer hover:bg-primary/10 transition-all">
+                                            <div class="text-sm font-medium">烤鸡胸肉</div>
+                                            <div class="text-xs text-gray-500">450千卡</div>
+                                        </div>
+                                    </td>
+                                    <td class="p-2">
+                                        <div class="bg-primary/5 rounded-lg p-2 text-center cursor-pointer hover:bg-primary/10 transition-all">
+                                            <div class="text-sm font-medium">意大利蔬菜千层面</div>
+                                            <div class="text-xs text-gray-500">560千卡</div>
+                                        </div>
+                                    </td>
+                                    <td class="p-2">
+                                        <div class="bg-primary/5 rounded-lg p-2 text-center cursor-pointer hover:bg-primary/10 transition-all">
+                                            <div class="text-sm font-medium">鲜虾炒饭</div>
+                                            <div class="text-xs text-gray-500">530千卡</div>
+                                        </div>
+                                    </td>
+                                    <td class="p-2">
+                                        <div class="bg-primary/5 rounded-lg p-2 text-center cursor-pointer hover:bg-primary/10 transition-all">
+                                            <div class="text-sm font-medium">蔬菜炖牛肉</div>
+                                            <div class="text-xs text-gray-500">580千卡</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- 操作按钮 -->
+                    <div class="flex justify-between mt-6">
+                        <button class="px-4 py-2 rounded bg-gray-100 hover:bg-gray-200 flex items-center">
+                            <i class="fa fa-refresh mr-2"></i> 自动生成
+                        </button>
+                        <div class="space-x-2">
+                            <button class="px-4 py-2 rounded bg-gray-100 hover:bg-gray-200 flex items-center">
+                                <i class="fa fa-download mr-2"></i> 导出
+                            </button>
+                            <button class="px-4 py-2 rounded bg-primary text-white hover:bg-primary/90 flex items-center">
+                                <i class="fa fa-save mr-2"></i> 保存计划
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 右侧营养分析 -->
+                <div class="lg:w-1/3" data-aos="fade-left">
+                    <!-- 营养摄入分析 -->
+                    <div class="bg-white rounded-xl shadow-card p-6 mb-6">
+                        <h3 class="text-xl font-bold mb-4">本周营养摄入</h3>
+                        <canvas id="nutritionChart" height="200"></canvas>
+                        <div class="grid grid-cols-3 gap-4 mt-4">
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-primary">1850</div>
+                                <div class="text-sm text-gray-500">平均卡路里</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-primary">85g</div>
+                                <div class="text-sm text-gray-500">蛋白质</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-primary">210g</div>
+                                <div class="text-sm text-gray-500">碳水化合物</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- AI推荐 -->
+                    <div class="bg-gradient-to-r from-primary/5 to-secondary/5 rounded-xl p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mr-3">
+                                <i class="fa fa-lightbulb-o text-primary"></i>
+                            </div>
+                            <h3 class="text-xl font-bold">AI智能推荐</h3>
+                        </div>
+                        <p class="text-gray-600 mb-4">根据你的饮食偏好和本周计划，我们推荐以下食谱：</p>
+                        <div class="space-y-3">
+                            <div class="bg-white rounded-lg p-3 flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <img src="https://p11-doubao-search-sign.byteimg.com/labis/6259309bbab384643e1b40b136257f3d~tplv-be4g95zd3a-image.jpeg?lk3s=feb11e32&x-expires=1789976074&x-signature=5TQqCAnuVW%2FLQW9K2%2FSh6CGuTxc%3D" alt="冬季健康汤" class="w-12 h-12 rounded object-cover mr-3">
+                                    <div>
+                                        <div class="font-medium">冬季健康蔬菜汤</div>
+                                        <div class="text-xs text-gray-500">320千卡 | 简单</div>
+                                    </div>
+                                </div>
+                                <button class="text-primary hover:text-primary/80">
+                                    <i class="fa fa-plus-circle"></i>
+                                </button>
+                            </div>
+                            <div class="bg-white rounded-lg p-3 flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <img src="https://p3-doubao-search-sign.byteimg.com/labis/77bbacae7b0f93ee83eb99b471db369b~tplv-be4g95zd3a-image.jpeg?lk3s=feb11e32&x-expires=1789976074&x-signature=VIHGdgwqVQp6DzSJJ8ZB8ADMmeU%3D" alt="素食沙拉" class="w-12 h-12 rounded object-cover mr-3">
+                                    <div>
+                                        <div class="font-medium">彩虹蔬菜沙拉</div>
+                                        <div class="text-xs text-gray-500">280千卡 | 简单</div>
+                                    </div>
+                                </div>
+                                <button class="text-primary hover:text-primary/80">
+                                    <i class="fa fa-plus-circle"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 购物清单 -->
+    <section id="shopping-list" class="section-padding bg-light">
+        <div class="container mx-auto px-4">
+            <h2 class="section-title" data-aos="fade-up">智能购物清单</h2>
+            
+            <div class="flex flex-col lg:flex-row gap-8">
+                <!-- 左侧购物清单 -->
+                <div class="lg:w-2/3 bg-white rounded-xl shadow-card p-6" data-aos="fade-right">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold">本周购物清单</h3>
+                        <div class="flex space-x-2">
+                            <button class="px-4 py-2 rounded bg-primary/10 text-primary hover:bg-primary/20 flex items-center">
+                                <i class="fa fa-magic mr-2"></i> 基于膳食计划生成
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 购物清单分类 -->
+                    <div class="space-y-6">
+                        <!-- 蔬菜类 -->
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <h4 class="font-bold text-lg flex items-center">
+                                    <i class="fa fa-leaf text-primary mr-2"></i> 蔬菜类
+                                </h4>
+                                <button class="text-sm text-gray-500 hover:text-primary">
+                                    <i class="fa fa-chevron-down"></i>
+                                </button>
+                            </div>
+                            <div class="space-y-2 pl-6">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <input type="checkbox" class="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary mr-3">
+                                        <span>西兰花</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <button class="w-6 h-6 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 mr-2">-</button>
+                                        <span class="w-6 text-center">2</span>
+                                        <button class="w-6 h-6 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 ml-2">+</button>
+                                        <span class="ml-2 text-gray-500">颗</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <input type="checkbox" class="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary mr-3">
+                                        <span>西红柿</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <button class="w-6 h-6 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 mr-2">-</button>
+                                        <span class="w-6 text-center">5</span>
+                                        <button class="w-6 h-6 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 ml-2">+</button>
+                                        <span class="ml-2 text-gray-500">个</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <input type="checkbox" class="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary mr-3" checked>
+                                        <span class="line-through text-gray-400">胡萝卜</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <button class="w-6 h-6 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 mr-2">-</button>
+                                        <span class="w-6 text-center">3</span>
+                                        <button class="w-6 h-6 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 ml-2">+</button>
+                                        <span class="ml-2 text-gray-500">根</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <input type="checkbox" class="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary mr-3">
+                                        <span>菠菜</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <button class="w-6 h-6 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 mr-2">-</button>
+                                        <span class="w-6 text-center">2</span>
+                                        <button class="w-6 h-6 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 ml-2">+</button>
+                                        <span class="ml-2 text-gray-500">把</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <input type="checkbox" class="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary mr-3">
+                                        <span>洋葱</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <button class="w-6 h-6 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 mr-2">-</button>
+                                        <span class="w-6 text-center">2</span>
+                                        <button class="w-6 h-6 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 ml-2">+</button>
+                                        <span class="ml-2 text-gray-500">个</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 肉类 -->
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <h4 class="font-bold text-lg flex items-center">
+                                    <i class="fa fa-cutlery text-primary mr-2"></i> 肉类
+                                </h4>
+                                <button class="text-sm text-gray-500 hover:text-primary">
+                                    <i class="fa fa-chevron-down"></i>
+                                </button>
+                            </div>
+                            <div class="space-y-2 pl-6">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <input type="checkbox" class="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary mr-3">
+                                        <span>鸡胸肉</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <button class="w-6 h-6 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 mr-2">-</button>
+                                        <span class="w-6 text-center">500</span>
+                                        <button class="w-6 h-6 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 ml-2">+</button>
+                                        <span class="ml-2 text-gray-500">克</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <input type="checkbox" class="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary mr-3">
+                                        <span>牛排</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <button class="w-6 h-6 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 mr-2">-</button>
+                                        <span class="w-6 text-center">2</span>
+                                        <button class="w-6 h-6 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 ml-2">+</button>
+                                        <span class="ml-2 text-gray-500">块</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <input type="checkbox" class="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary mr-3">
+                                        <span>三文鱼片</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <button class="w-6 h-6 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 mr-2">-</button>
+                                        <span class="w-6 text-center">300</span>
+                                        <button class="w-6 h-6 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 ml-2">+</button>
+                                        <span class="ml-2 text-gray-500">克</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 调料类 -->
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <h4 class="font-bold text-lg flex items-center">
+                                    <i class="fa fa-flask text-primary mr-2"></i> 调料类
+                                </h4>
+                                <button class="text-sm text-gray-500 hover:text-primary">
+                                    <i class="fa fa-chevron-down"></i>
+                                </button>
+                            </div>
+                            <div class="space-y-2 pl-6">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <input type="checkbox" class="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary mr-3">
+                                        <span>橄榄油</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <button class="w-6 h-6 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 mr-2">-</button>
+                                        <span class="w-6 text-center">1</span>
+                                        <button class="w-6 h-6 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 ml-2">+</button>
+                                        <span class="ml-2 text-gray-500">瓶</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <input type="checkbox" class="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary mr-3" checked>
+                                        <span class="line-through text-gray-400">黑胡椒</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <button class="w-6 h-6 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 mr-2">-</button>
+                                        <span class="w-6 text-center">1</span>
+                                        <button class="w-6 h-6 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 ml-2">+</button>
+                                        <span class="ml-2 text-gray-500">瓶</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 操作按钮 -->
+                    <div class="flex justify-between mt-8">
+                        <button class="px-4 py-2 rounded bg-gray-100 hover:bg-gray-200 flex items-center">
+                            <i class="fa fa-plus mr-2"></i> 添加物品
+                        </button>
+                        <div class="space-x-2">
+                            <button class="px-4 py-2 rounded bg-gray-100 hover:bg-gray-200 flex items-center">
+                                <i class="fa fa-share-alt mr-2"></i> 分享
+                            </button>
+                            <button class="px-4 py-2 rounded bg-primary text-white hover:bg-primary/90 flex items-center">
+                                <i class="fa fa-download mr-2"></i> 导出清单
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 右侧购物助手 -->
+                <div class="lg:w-1/3" data-aos="fade-left">
+                    <!-- 购物助手 -->
+                    <div class="bg-white rounded-xl shadow-card p-6 mb-6">
+                        <h3 class="text-xl font-bold mb-4">购物助手</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <span>已勾选物品</span>
+                                <span class="font-medium">2/12</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-primary h-2.5 rounded-full" style="width: 16.67%"></div>
+                            </div>
+                            
+                            <div class="pt-4 border-t border-gray-100">
+                                <h4 class="font-medium mb-2">节省建议</h4>
+                                <div class="bg-primary/5 rounded-lg p-3 text-sm">
+                                    <p class="mb-2"><i class="fa fa-lightbulb-o text-primary mr-1"></i> 本周食谱可减少30%的肉类使用，更健康且省钱</p>
+                                    <p><i class="fa fa-lightbulb-o text-primary mr-1"></i> 建议购买当季蔬菜，更新鲜且价格更实惠</p>
+                                </div>
+                            </div>
+                            
+                            <div class="pt-4 border-t border-gray-100">
+                                <h4 class="font-medium mb-2">附近超市</h4>
+                                <div class="space-y-2">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center">
+                                            <i class="fa fa-shopping-basket text-primary mr-2"></i>
+                                            <span>永辉超市</span>
+                                        </div>
+                                        <span class="text-xs text-gray-500">1.2km</span>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center">
+                                            <i class="fa fa-shopping-basket text-primary mr-2"></i>
+                                            <span>盒马鲜生</span>
+                                        </div>
+                                        <span class="text-xs text-gray-500">2.5km</span>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center">
+                                            <i class="fa fa-shopping-basket text-primary mr-2"></i>
+                                            <span>沃尔玛</span>
+                                        </div>
+                                        <span class="text-xs text-gray-500">3.1km</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 购物清单图片 -->
+                    <div class="bg-white rounded-xl shadow-card overflow-hidden">
+                        <img src="https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/209e769235fd4e9c9ad5bea5d7f0d454~tplv-a9rns2rl98-image.image?lk3s=8e244e95&rcl=202603251533482892D98D7AADF38B85A7&rrcfp=f06b921b&x-expires=1777016098&x-signature=XFqtuXAEirdYUb2j%2F3%2BWBGf%2FQgI%3D" alt="购物清单" class="w-full">
+                        <div class="p-4 text-center">
+                            <button class="btn-secondary w-full">
+                                <i class="fa fa-mobile mr-2"></i> 下载移动应用
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 用户评价 -->
+    <section class="section-padding bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="section-title" data-aos="fade-up">用户的真实评价</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- 评价卡片 1 -->
+                <div class="bg-light rounded-xl p-6 shadow-sm" data-aos="fade-up" data-aos-delay="100">
+                    <div class="flex items-center mb-4">
+                        <div class="text-yellow-400 flex">
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                        </div>
+                        <span class="ml-2 text-gray-500">5.0</span>
+                    </div>
+                    <p class="text-gray-600 mb-6">
+                        "食光计划彻底改变了我的烹饪体验！AI推荐的食谱非常符合我的口味，膳食规划功能让我不再为每天吃什么而烦恼，购物清单也帮我节省了大量时间。"
+                    </p>
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mr-3">
+                            <span class="font-medium text-primary">L</span>
+                        </div>
+                        <div>
+                            <div class="font-medium">李小明</div>
+                            <div class="text-sm text-gray-500">使用3个月</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 评价卡片 2 -->
+                <div class="bg-light rounded-xl p-6 shadow-sm" data-aos="fade-up" data-aos-delay="200">
+                    <div class="flex items-center mb-4">
+                        <div class="text-yellow-400 flex">
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star-half-o"></i>
+                        </div>
+                        <span class="ml-2 text-gray-500">4.5</span>
+                    </div>
+                    <p class="text-gray-600 mb-6">
+                        "作为一个忙碌的上班族，食光计划帮我高效管理饮食。购物清单功能特别实用，按超市分类整理得很清楚，再也不会遗漏食材或买重复了。"
+                    </p>
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mr-3">
+                            <span class="font-medium text-primary">W</span>
+                        </div>
+                        <div>
+                            <div class="font-medium">王佳怡</div>
+                            <div class="text-sm text-gray-500">使用6个月</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 评价卡片 3 -->
+                <div class="bg-light rounded-xl p-6 shadow-sm" data-aos="fade-up" data-aos-delay="300">
+                    <div class="flex items-center mb-4">
+                        <div class="text-yellow-400 flex">
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star-o"></i>
+                        </div>
+                        <span class="ml-2 text-gray-500">4.0</span>
+                    </div>
+                    <p class="text-gray-600 mb-6">
+                        "我是一个烹饪爱好者，食光计划的食谱管理功能非常棒，可以轻松收藏和分类各种食谱。AI推荐系统也很智能，经常能发现新的美食灵感。"
+                    </p>
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mr-3">
+                            <span class="font-medium text-primary">Z</span>
+                        </div>
+                        <div>
+                            <div class="font-medium">张伟</div>
+                            <div class="text-sm text-gray-500">使用1年</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 开始使用 -->
+    <section class="py-16 bg-gradient-to-r from-primary to-primary/80 text-white">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl md:text-4xl font-bold mb-6" data-aos="fade-up">开始你的健康饮食之旅</h2>
+            <p class="text-lg md:text-xl mb-8 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">
+                加入食光计划，让每一餐都成为美好时光，享受健康、美味且不浪费的饮食生活。
+            </p>
+            <button class="bg-white text-primary px-8 py-3 rounded-full font-bold hover:bg-opacity-90 transition-all duration-300 shadow-lg hover:shadow-xl text-lg" data-aos="fade-up" data-aos-delay="200">
+                立即免费注册 <i class="fa fa-arrow-right ml-2"></i>
+            </button>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- Logo和简介 -->
+                <div class="md:col-span-1">
+                    <div class="flex items-center space-x-2 mb-4">
+                        <img src="https://p11-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/628f071ac17b409cb46c7b860f1e461d~tplv-a9rns2rl98-image.image?lk3s=8e244e95&rcl=202603251533482892D98D7AADF38B85A7&rrcfp=f06b921b&x-expires=1777016098&x-signature=VVCo1fUP9MMLpTCEJy7TVl2c%2BgY%3D" alt="食光计划" class="h-8">
+                        <span class="text-xl font-bold">食光计划</span>
+                    </div>
+                    <p class="text-gray-400 mb-4">
+                        让每一餐都成为美好时光，享受健康、美味且不浪费的饮食生活。
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fa fa-weixin text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fa fa-weibo text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fa fa-instagram text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fa fa-youtube-play text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- 快速链接 -->
+                <div>
+                    <h3 class="text-lg font-bold mb-4">快速链接</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">首页</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">食谱库</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">膳食规划</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">购物清单</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">关于我们</a></li>
+                    </ul>
+                </div>
+                
+                <!-- 支持 -->
+                <div>
+                    <h3 class="text-lg font-bold mb-4">支持</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">帮助中心</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">常见问题</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">联系我们</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">隐私政策</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">使用条款</a></li>
+                    </ul>
+                </div>
+                
+                <!-- 联系方式 -->
+                <div>
+                    <h3 class="text-lg font-bold mb-4">联系我们</h3>
+                    <ul class="space-y-2">
+                        <li class="flex items-center">
+                            <i class="fa fa-envelope-o text-gray-400 mr-2"></i>
+                            <a href="mailto:contact@shiguang.com" class="text-gray-400 hover:text-white transition-colors">contact@shiguang.com</a>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fa fa-phone text-gray-400 mr-2"></i>
+                            <span class="text-gray-400">400-123-4567</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fa fa-map-marker text-gray-400 mr-2"></i>
+                            <span class="text-gray-400">北京市朝阳区科技园A座</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-500">
+                <p>&copy; 2025 食光计划. 保留所有权利.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // 初始化AOS动画库
+        document.addEventListener('DOMContentLoaded', function() {
+            AOS.init({
+                duration: 800,
+                easing: 'ease-in-out',
+                once: true
+            });
+            
+            // 移动端菜单切换
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            mobileMenuButton.addEventListener('click', function() {
+                mobileMenu.classList.toggle('hidden');
+            });
+            
+            // 营养摄入图表
+            const ctx = document.getElementById('nutritionChart').getContext('2d');
+            const nutritionChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+                    datasets: [
+                        {
+                            label: '蛋白质 (g)',
+                            data: [85, 90, 75, 80, 85, 95, 90],
+                            backgroundColor: '#4CAF50',
+                            borderWidth: 0
+                        },
+                        {
+                            label: '碳水化合物 (g)',
+                            data: [210, 220, 190, 200, 215, 230, 225],
+                            backgroundColor: '#FF9800',
+                            borderWidth: 0
+                        },
+                        {
+                            label: '脂肪 (g)',
+                            data: [45, 48, 40, 42, 46, 50, 48],
+                            backgroundColor: '#2196F3',
+                            borderWidth: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            stacked: true,
+                            grid: {
+                                display: false
+                            }
+                        },
+                        y: {
+                            stacked: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+            
+            // 平滑滚动
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#') return;
+                    
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                        
+                        // 如果是移动端，点击后关闭菜单
+                        if (window.innerWidth < 768) {
+                            mobileMenu.classList.add('hidden');
+                        }
+                    }
+                });
+            });
+            
+            // 食谱收藏功能
+            const heartButtons = document.querySelectorAll('.fa-heart-o');
+            heartButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    this.classList.toggle('fa-heart-o');
+                    this.classList.toggle('fa-heart');
+                    this.classList.toggle('text-primary');
+                });
+            });
+            
+            // 购物清单数量调整
+            const minusButtons = document.querySelectorAll('.fa-chevron-down');
+            minusButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const parentDiv = this.closest('div');
+                    const categoryContent = parentDiv.nextElementSibling;
+                    categoryContent.classList.toggle('hidden');
+                    
+                    if (categoryContent.classList.contains('hidden')) {
+                        this.classList.remove('fa-chevron-down');
+                        this.classList.add('fa-chevron-right');
+                    } else {
+                        this.classList.remove('fa-chevron-right');
+                        this.classList.add('fa-chevron-down');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
